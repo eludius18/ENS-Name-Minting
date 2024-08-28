@@ -35,6 +35,8 @@ contract ENSMinting is Ownable, ReentrancyGuard {
      * @param owner The address of the new owner of the ENS name.
      */
     function mintENSName(bytes32 node, string calldata name, address owner) external nonReentrant {
+        require(ensRegistry.owner(node) == address(0), "Name already minted");
+        
         ensRegistry.setSubnodeOwner(bytes32(0), node, owner);
         ensRegistry.setResolver(node, address(publicResolver));
         publicResolver.setAddr(node, owner);
