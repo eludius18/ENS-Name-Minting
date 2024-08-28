@@ -12,12 +12,24 @@ contract ENSMinting {
     PublicResolver private publicResolver;
     ENSReverseRegistrar.ReverseRegistrar private reverseRegistrar;
 
+    /**
+     * @dev Constructor to initialize the ENSMinting contract.
+     * @param _ensRegistry The address of the ENS registry contract.
+     * @param _publicResolver The address of the public resolver contract.
+     * @param _reverseRegistrar The address of the reverse registrar contract.
+     */
     constructor(address _ensRegistry, address _publicResolver, address _reverseRegistrar) {
         ensRegistry = ENS(_ensRegistry);
         publicResolver = PublicResolver(_publicResolver);
         reverseRegistrar = ENSReverseRegistrar.ReverseRegistrar(_reverseRegistrar);
     }
 
+    /**
+     * @dev Mints a new ENS name.
+     * @param node The node representing the ENS name.
+     * @param name The ENS name to be minted.
+     * @param owner The address of the new owner of the ENS name.
+     */
     function mintENSName(bytes32 node, string calldata name, address owner) external {
         ensRegistry.setSubnodeOwner(bytes32(0), node, owner);
         ensRegistry.setResolver(node, address(publicResolver));
@@ -28,11 +40,21 @@ contract ENSMinting {
         reverseRegistrar.setName(name);
     }
 
+    /**
+     * @dev Resolves an address to its ENS name.
+     * @param addr The address to be resolved.
+     * @return The ENS name associated with the address.
+     */
     function forwardResolve(address addr) external view returns (string memory) {
         bytes32 node = keccak256(abi.encodePacked(bytes32(0), keccak256(abi.encodePacked(reverseRegistrar.node(addr)))));
         return publicResolver.name(node);
     }
 
+    /**
+     * @dev Resolves an ENS name to its associated address.
+     * @param name The ENS name to be resolved.
+     * @return The address associated with the ENS name.
+     */
     function reverseResolve(string calldata name) external view returns (address) {
         bytes32 node = keccak256(abi.encodePacked(bytes32(0), keccak256(abi.encodePacked(name))));
         return publicResolver.addr(node);

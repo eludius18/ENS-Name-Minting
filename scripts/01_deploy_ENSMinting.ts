@@ -1,4 +1,8 @@
 import { ethers } from "hardhat";
+import dotenv from "dotenv";
+
+// Load environment variables from .env file
+dotenv.config();
 
 async function main() {
   const [deployer] = await ethers.getSigners();
@@ -6,17 +10,26 @@ async function main() {
   console.log("Deploying ENSMinting contract with the account:", deployer.address);
 
   try {
+    const ENSRegistryAddress = process.env.ENS_REGISTRY_ADDRESS!;
+    const PublicResolverAddress = process.env.PUBLIC_RESOLVER_ADDRESS!;
+    const ReverseRegistrarAddress = process.env.REVERSE_REGISTRAR_ADDRESS!;
+
     // Deploy ENSMinting contract
     const ENSMintingFactory = await ethers.getContractFactory("ENSMinting");
     const ensMinting = await ENSMintingFactory.deploy(
-      "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e", // Replace with the actual ENSRegistry address
-      "0x231b0Ee14048e9dCcD1d247744d114a4EB5E8E63", // Replace with the actual PublicResolver address
-      "0xa58E81fe9b61B5c3fE2AFD33CF304c454AbFc7Cb" // Replace with the actual ReverseRegistrar address
+      ENSRegistryAddress,
+      PublicResolverAddress,
+      ReverseRegistrarAddress
     );
 
-    await ensMinting.waitForDeployment(); // Wait for the deployment to be mined
+    await ensMinting.waitForDeployment();
 
-    console.log("ENS Minting deployed to:", await ensMinting.getAddress());
+    const ensMintingAddress = await ensMinting.getAddress();
+
+    console.log("ENS Minting deployed to:", ensMintingAddress);
+
+    // Store or print the address for use in the test script
+    console.log(`ENS Minting Contract Address: ${ensMintingAddress}`);
   } catch (error) {
     console.error("Error during deployment:", error);
   }
