@@ -102,7 +102,7 @@ Once your Hardhat node is running with the forked mainnet, you can deploy the co
 1. **Run the deployment script for `ENSMinting`:**
 
    ```bash
-   npx hardhat run scripts/deploy_ENSMinting.ts --network localhost
+   npx hardhat run scripts/01_deploy_ENSMinting.ts --network localhost
    ```
 
    This script will deploy the `ENSMinting` contract to your locally forked mainnet.
@@ -112,7 +112,7 @@ Once your Hardhat node is running with the forked mainnet, you can deploy the co
 1. **Run the deployment script for `WhitelistedRegistrar`:**
 
    ```bash
-   npx hardhat run scripts/deploy_WhitelistedRegistrar.ts --network localhost
+   npx hardhat run scripts/02_deploy_WhitelistedRegistrar.ts --network localhost
    ```
 
    This script will deploy the `WhitelistedRegistrar` contract to your locally forked mainnet.

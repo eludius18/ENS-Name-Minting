@@ -2,8 +2,10 @@
 pragma solidity ~0.8.17;
 
 import "@ensdomains/ens-contracts/contracts/ethregistrar/ETHRegistrarController.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract WhitelistedRegistrar {
+contract WhitelistedRegistrar is Ownable, ReentrancyGuard {
     ETHRegistrarController public ethRegistrarController;
 
     mapping(address => bool) public whitelist;
@@ -23,14 +25,6 @@ contract WhitelistedRegistrar {
         ETHRegistrarController _ethRegistrarController
     ) {
         ethRegistrarController = _ethRegistrarController;
-    }
-
-    /**
-     * @dev Modifier to restrict access to only the owner.
-     */
-    modifier onlyOwner() {
-        // Implement ownership logic here
-        _;
     }
 
     /**
@@ -55,7 +49,7 @@ contract WhitelistedRegistrar {
      * @param account The address to be removed from the whitelist.
      */
     function removeAddressFromWhitelist(address account) external onlyOwner {
-        whitelist[account] = false;
+        delete whitelist[account];
         emit AddressRemovedFromWhitelist(account);
     }
 
@@ -109,7 +103,7 @@ contract WhitelistedRegistrar {
         bytes[] calldata data,
         bool reverseRecord,
         uint16 ownerControlledFuses
-    ) public payable onlyWhitelisted {
+    ) public payable onlyWhitelisted nonReentrant {
         ethRegistrarController.register{value: msg.value}(
             name,
             owner,

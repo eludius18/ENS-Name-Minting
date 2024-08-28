@@ -6,8 +6,10 @@ import "@ensdomains/ens-contracts/contracts/registry/ENSRegistry.sol";
 import "@ensdomains/ens-contracts/contracts/registry/ENSRegistryWithFallback.sol";
 import "@ensdomains/ens-contracts/contracts/resolvers/PublicResolver.sol";
 import "@ensdomains/ens-contracts/contracts/reverseRegistrar/ReverseRegistrar.sol" as ENSReverseRegistrar;
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract ENSMinting {
+contract ENSMinting is Ownable, ReentrancyGuard {
     ENS private ensRegistry;
     PublicResolver private publicResolver;
     ENSReverseRegistrar.ReverseRegistrar private reverseRegistrar;
@@ -24,13 +26,15 @@ contract ENSMinting {
         reverseRegistrar = ENSReverseRegistrar.ReverseRegistrar(_reverseRegistrar);
     }
 
+    event ENSNameMinted(bytes32 indexed node, string name, address indexed owner);
+
     /**
      * @dev Mints a new ENS name.
      * @param node The node representing the ENS name.
      * @param name The ENS name to be minted.
      * @param owner The address of the new owner of the ENS name.
      */
-    function mintENSName(bytes32 node, string calldata name, address owner) external {
+    function mintENSName(bytes32 node, string calldata name, address owner) external nonReentrant {
         ensRegistry.setSubnodeOwner(bytes32(0), node, owner);
         ensRegistry.setResolver(node, address(publicResolver));
         publicResolver.setAddr(node, owner);
@@ -38,6 +42,7 @@ contract ENSMinting {
         
         // Set up reverse record for reverse resolution
         reverseRegistrar.setName(name);
+        emit ENSNameMinted(node, name, owner);
     }
 
     /**
