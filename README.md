@@ -28,19 +28,21 @@ The `WhitelistedRegistrar` contract extends the functionality of a traditional r
 - **Disabling Whitelist**: Admins can disable the whitelist entirely, allowing all addresses to mint names.
 
 **Constructor Parameters**:
-- `_base`: Address of the Base Registrar Implementation contract.
-- `_prices`: Address of the Price Oracle contract.
-- `_minCommitmentAge`: Minimum age of a commitment.
-- `_maxCommitmentAge`: Maximum age of a commitment.
-- `_reverseRegistrar`: Address of the Reverse Registrar contract.
-- `_nameWrapper`: Address of the Name Wrapper contract.
-- `_ens`: Address of the Name Registry contract.
+- `_ethRegistrarController`: Address of the ETH Registrar Controller contract.
 
 **Key Functions**:
 - `addAddressToWhitelist(address account)`: Adds an address to the whitelist, allowing it to register names.
 - `removeAddressFromWhitelist(address account)`: Removes an address from the whitelist, preventing it from registering names.
 - `disableWhitelist()`: Disables the whitelist, allowing all addresses to register names.
 - `canMint(address account)`: Checks if a given address is allowed to mint a name.
+
+**Additional Functionalities**:
+- **Phases and Limits**: The contract is designed with phases where each phase can have a different limit of whitelisted addresses:
+  - **Phase 0**: Limited to 50 addresses.
+  - **Phase 1**: Limited to 100 addresses.
+  - **Phase 2**: Limited to 200 addresses.
+- **Whitelist Disable Option**: The whitelist can be disabled at any time, allowing all users to mint names.
+- **Whitelist Check**: Before any address can register a name, it is checked against the whitelist unless the whitelist has been disabled.
 
 ## Deployment
 

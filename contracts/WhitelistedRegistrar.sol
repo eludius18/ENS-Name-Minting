@@ -12,6 +12,9 @@ contract WhitelistedRegistrar is Ownable, ReentrancyGuard {
     bool public whitelistDisabled = false;
     uint256 public phase = 0;
 
+    mapping(uint256 => uint256) public phaseLimits;
+    uint256 public whitelistedCount = 0;
+
     event PhaseChanged(uint256 newPhase);
     event WhitelistDisabled();
     event AddressWhitelisted(address indexed account);
@@ -25,6 +28,9 @@ contract WhitelistedRegistrar is Ownable, ReentrancyGuard {
         ETHRegistrarController _ethRegistrarController
     ) {
         ethRegistrarController = _ethRegistrarController;
+        phaseLimits[0] = 50; 
+        phaseLimits[1] = 100;
+        phaseLimits[2] = 200;
     }
 
     /**
@@ -40,7 +46,11 @@ contract WhitelistedRegistrar is Ownable, ReentrancyGuard {
      * @param account The address to be added to the whitelist.
      */    
     function addAddressToWhitelist(address account) external onlyOwner {
+        require(!whitelist[account], "Already whitelisted");
+        require(canAddToWhitelist(), "Whitelist limit reached for current phase");
+
         whitelist[account] = true;
+        whitelistedCount++;
         emit AddressWhitelisted(account);
     }
 
@@ -49,7 +59,10 @@ contract WhitelistedRegistrar is Ownable, ReentrancyGuard {
      * @param account The address to be removed from the whitelist.
      */
     function removeAddressFromWhitelist(address account) external onlyOwner {
+        require(whitelist[account], "Not in whitelist");
+
         delete whitelist[account];
+        whitelistedCount--;
         emit AddressRemovedFromWhitelist(account);
     }
 
@@ -81,6 +94,18 @@ contract WhitelistedRegistrar is Ownable, ReentrancyGuard {
             return true;
         }
         return whitelist[account];
+    }
+
+    /**
+     * @dev Checks if more addresses can be added to the whitelist based on the current phase.
+     * @return True if more addresses can be added, false otherwise.
+     */
+    function canAddToWhitelist() public view returns (bool) {
+        if (whitelistDisabled) {
+            return true;
+        }
+        uint256 limit = phaseLimits[phase];
+        return whitelistedCount < limit;
     }
 
     /**
