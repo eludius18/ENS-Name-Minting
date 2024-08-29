@@ -119,7 +119,7 @@ Once your Hardhat node is running with the forked mainnet, you can deploy the co
 
    This script will deploy the `WhitelistedRegistrar` contract to your locally forked mainnet.
 
-## Running Tests (Not Implemented yet)
+## Running Tests (WIP)
 
 After deploying the contracts, you can run the tests to ensure everything is working as expected.
 
@@ -130,6 +130,12 @@ After deploying the contracts, you can run the tests to ensure everything is wor
    ```
 
    This command will execute the test suite against the deployed contracts on your locally forked mainnet.
+
+**Test Results Screenshot**
+
+Below is a screenshot showing the results of the tests executed for the `ENSMinting` and `WhitelistedRegistrar` contracts:
+
+![Test Results](utils/Screenshot-tests.png)
 
 ## Note
 
